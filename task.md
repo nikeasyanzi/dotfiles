@@ -1,0 +1,23 @@
+# YADM Dotfiles Setup Tasks
+
+- [x] Planning YADM Dotfiles Setup
+    - [x] Initial implementation plan
+    - [x] Add additional packages to plan
+    - [x] Add cleanup and migration strategy to plan
+- [ ] Phase 1: Initial YADM Setup (Local Mac)
+    - [ ] Install YADM
+    - [ ] Initialize repo
+    - [x] Verified initial files (`.zshrc`, `.tmux.conf`, `~/.config/nvim`, `.gitconfig`, `.p10k.zsh`, `.ssh/config`)
+- [ ] Phase 2: Cleanup and Migration
+    - [ ] Audit current Mac configs
+    - [ ] Extract platform-specific logic to alternates
+    - [ ] Clean up redundant entries
+- [ ] Phase 3: Bootstrap and Automation
+    - [ ] Create `~/.config/yadm/bootstrap`
+    - [ ] Add packages to bootstrap
+- [ ] Phase 4: Cross-Platform Deployment
+    - [ ] Test on Ubuntu (Backup or New install)
+    - [ ] Verify alternates work correctly
+- [ ] Phase 5: Documentation
+    - [ ] Create final walkthrough
+    - [ ]  Create README.md
