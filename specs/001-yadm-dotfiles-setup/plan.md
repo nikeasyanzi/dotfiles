@@ -62,8 +62,6 @@ specs/001-yadm-dotfiles-setup/
 ├── .tmux.conf          # Tmux config
 ├── .gitconfig          # Git config
 ├── .p10k.zsh           # Powerlevel10k config
-└── .ssh/
-    └── config          # SSH config
 ```
 
 **Structure Decision**: Standard YADM layout with dotfiles at root (mimicking $HOME) and helper scripts in `.config/yadm` or `scripts/`.

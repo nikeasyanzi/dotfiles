@@ -76,4 +76,4 @@
 
 - [x] T026 Create `README.md` with usage instructions (from `quickstart.md`)
 - [ ] T027 Final end-to-end test on local execution
-- [ ] T028 Update project `files` list in `tasks.md` or similar to track progress
+- [x] T028 Update project `files` list in `tasks.md` or similar to track progress

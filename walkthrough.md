@@ -11,7 +11,7 @@ Ensure the following files exist in `~/workplace/dotfile`:
 - [x] `.config/yadm/bootstrap` (Executable)
 - [x] `setup.sh` (Executable)
 - [x] `scripts/cleanup.sh`
-- [x] `.ssh/config`, `.gitconfig`, `.tmux.conf`, `.p10k.zsh`
+- [x] `.gitconfig`, `.tmux.conf`, `.p10k.zsh`
 - [x] `.gitignore`
 
 ## 2. Push to Remote

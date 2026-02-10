@@ -15,8 +15,7 @@ Managed via [YADM](https://yadm.io/).
 
 ```bash
 # 1. Clone & Install
-curl -fLo setup.sh https://raw.githubusercontent.com/craigyang/dotfiles/main/setup.sh
-bash setup.sh
+curl -fsSL https://raw.githubusercontent.com/craigyang/dotfiles/main/setup.sh | bash
 ```
 
 *(Note: automatic backup of existing dotfiles is performed before installation)*
