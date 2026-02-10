@@ -14,6 +14,7 @@
 - Q: GUI Apps (Homebrew Casks)? -> A: **CLI Only** (Bootstrap script installs only command-line tools; GUI apps like iTerm2 are manual).
 - Q: Setup Script Location? -> A: **In YADM Repo** (Tracked in repo root; deployed via curl from GitHub raw URL on first-time setup).
 - Q: Cleanup Script Behavior? -> A: **Fully Automated** (Backs up to timestamped directory and removes without prompting; logs all actions).
+- Q: SSH Config? -> A: **Excluded** (User manages SSH config manually; simpler security model).
 
 ## User Scenarios & Testing *(mandatory)*
 

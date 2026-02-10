@@ -1,0 +1,128 @@
+#!/bin/bash
+# .config/yadm/bootstrap - Automated setup script for YADM
+
+set -e
+
+# OS Detection
+OS="$(uname -s)"
+echo "🚀 Bootstrapping on $OS..."
+
+# --- 1. Package Installation ---
+install_packages() {
+    if [ "$OS" = "Darwin" ]; then
+        echo "🍎 macOS detected. Using Homebrew..."
+        if ! command -v brew &> /dev/null; then
+            echo "Homebrew not found. Installing..."
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        fi
+        
+        # Update and Install
+        brew update
+        # Core CLI tools
+        PACKAGES=(
+            git
+            neovim
+            tmux
+            zsh
+            fzf
+            ripgrep
+            fd
+            bat
+            lsd
+            zoxide
+            eza
+        )
+        brew install "${PACKAGES[@]}"
+        
+        # Optional: Mac specific casks if we wanted (User said CLI only, so skipping casks)
+        
+    elif [ "$OS" = "Linux" ]; then
+        echo "🐧 Linux detected. Using apt..."
+        # Check for apt
+        if command -v apt &> /dev/null; then
+             sudo apt update
+             
+             # Tools that might be named differently or need ppa
+             # Neovim usually needs unstable ppa for latest, but standard is okay for now
+             # fdfind, batcat
+             
+             COMMON_PACKAGES=(
+                 git
+                 neovim
+                 tmux
+                 zsh
+                 fzf
+                 ripgrep
+                 fd-find
+                 bat
+             )
+             
+             sudo apt install -y "${COMMON_PACKAGES[@]}"
+             
+             # Link fd-find to fd, bat to batcat
+             mkdir -p "$HOME/.local/bin"
+             [ -f /usr/bin/fdfind ] && ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
+             [ -f /usr/bin/batcat ] && ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
+             
+             # Install eza/zoxide via other means if not in apt?
+             # For simplicity, we skip non-standard installs unless critical.
+             # User mentioned specific tools? Plan says "Add Cargo/alternative installs... if needed"
+             # We'll skip complex cargo installs to keep bootstrap fast, unless strictly required.
+             # eza is nice-to-have.
+             
+        else
+            echo "⚠️ Unsupported Linux package manager. Skipping package install."
+        fi
+    fi
+}
+
+install_packages
+
+# --- 2. Oh My Zsh ---
+install_omz() {
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        echo "Installing Oh My Zsh..."
+        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    else
+        echo "✅ Oh My Zsh already installed."
+    fi
+    
+    # Install Plugins (zsh-autosuggestions, zsh-syntax-highlighting)
+    ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
+    
+    if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+        git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+    fi
+    
+    if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+        git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+    fi
+    
+    # Install Powerlevel10k
+    if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
+        git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
+    fi
+}
+
+install_omz
+
+# --- 3. Shell Setup ---
+setup_shell() {
+    CURRENT_SHELL=$(basename "$SHELL")
+    if [ "$CURRENT_SHELL" != "zsh" ]; then
+        echo "Changing default shell to zsh..."
+        # If zsh is in allowed shells
+        ZSH_PATH=$(command -v zsh)
+        if grep -q "$ZSH_PATH" /etc/shells; then
+            chsh -s "$ZSH_PATH"
+        else
+            echo "Adding $ZSH_PATH to /etc/shells..."
+            echo "$ZSH_PATH" | sudo tee -a /etc/shells
+            chsh -s "$ZSH_PATH"
+        fi
+    fi
+}
+
+setup_shell
+
+echo "🎉 Bootstrap complete!"

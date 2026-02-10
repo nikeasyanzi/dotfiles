@@ -38,7 +38,6 @@
 - [ ] T011 [US1] Add `.tmux.conf`
 - [ ] T012 [US1] Add `.gitconfig`
 - [ ] T013 [US1] Add `.p10k.zsh`
-- [ ] T014 [US1] Add `.ssh/config` (sanitized)
 - [ ] T015 [US1] Commit all initial config files to YADM repo
 
 **Checkpoint**: Repo contains all core config files. `yadm status` on Mac is clean.

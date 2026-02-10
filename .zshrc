@@ -165,3 +165,16 @@ eval "$(zoxide init zsh)"
 
 # Added by Antigravity
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
+
+# Linux/Ubuntu Specifics
+if [[ "$(uname -s)" == "Linux" ]]; then
+    alias apt="sudo apt"
+    alias update="sudo apt update && sudo apt upgrade"
+    # Ensure bat/fd aliases if symlinks fail
+    if ! command -v fd &> /dev/null && command -v fdfind &> /dev/null; then
+        alias fd=fdfind
+    fi
+    if ! command -v bat &> /dev/null && command -v batcat &> /dev/null; then
+        alias bat=batcat
+    fi
+fi

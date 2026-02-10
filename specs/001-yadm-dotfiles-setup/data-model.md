@@ -12,7 +12,6 @@
 | `~/.tmux.conf` | Tmux configuration | Shared |
 | `~/.gitconfig` | Git global configuration | Shared |
 | `~/.p10k.zsh` | Powerlevel10k theme settings | Shared |
-| `~/.ssh/config` | SSH host aliases | Shared (Secrets excluded) |
 
 ## Helper Scripts
 

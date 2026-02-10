@@ -10,7 +10,6 @@ TARGETS=(
     "$HOME/.tmux.conf"
     "$HOME/.gitconfig"
     "$HOME/.p10k.zsh"
-    "$HOME/.ssh/config"
     "$HOME/.config/yadm"
     "$HOME/.local/share/yadm"
     "$HOME/.yadm"
