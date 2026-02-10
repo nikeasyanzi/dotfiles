@@ -1,0 +1,40 @@
+#!/bin/bash
+# cleanup.sh - Automates backup and removal of existing dotfiles for clean YADM install
+
+set -e
+
+BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d%H%M%S)"
+TARGETS=(
+    "$HOME/.zshrc"
+    "$HOME/.config/nvim"
+    "$HOME/.tmux.conf"
+    "$HOME/.gitconfig"
+    "$HOME/.p10k.zsh"
+    "$HOME/.ssh/config"
+    "$HOME/.config/yadm"
+    "$HOME/.local/share/yadm"
+    "$HOME/.yadm"
+)
+
+echo "🧹 Starting cleanup for YADM installation..."
+echo "📂 Backup directory: $BACKUP_DIR"
+
+mkdir -p "$BACKUP_DIR"
+
+for target in "${TARGETS[@]}"; do
+    if [ -e "$target" ]; then
+        echo "   Found existing: $target"
+        
+        # Preserve directory structure in backup
+        rel_path="${target#$HOME/}"
+        backup_path="$BACKUP_DIR/$rel_path"
+        mkdir -p "$(dirname "$backup_path")"
+        
+        mv "$target" "$backup_path"
+        echo "   Moved to: $backup_path"
+    else
+        echo "   Skipping (not found): $target"
+    fi
+done
+
+echo "✨ Cleanup complete. Ready for YADM clone."

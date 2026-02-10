@@ -8,8 +8,8 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [x] T001 Create project directories: `.config/yadm`, `scripts`
-- [x] T002 Initialize empty `bootstrap` and `cleanup.sh` scripts
+- [ ] T001 Create project directories: `.config/yadm`, `scripts`
+- [ ] T002 Initialize empty `bootstrap` and `cleanup.sh` scripts
 
 ---
 
@@ -18,10 +18,10 @@
 **Purpose**: Core deployment logic (Cleanup + Install) needed for any reliable deployment.
 **Stories**: [US5] (Cleanup), [US2] (Deploy) - these are tightly coupled via `setup.sh`.
 
-- [x] T003 [US5] Implement `scripts/cleanup.sh`: logic to detect and remove `~/.local/share/yadm`
-- [x] T004 [US5] Add logic to `scripts/cleanup.sh`: detect existing dotfiles, backup to timestamped dir, and remove originals
-- [x] T005 [US2] Create root `setup.sh`: Orchestrator that runs `cleanup.sh` then `yadm clone --bootstrap`
-- [x] T006 [US2] Add platform detection (`uname -s`) to logic to ensure correct yadm install command (brew vs apt)
+- [ ] T003 [US5] Implement `scripts/cleanup.sh`: logic to detect and remove `~/.local/share/yadm`
+- [ ] T004 [US5] Add logic to `scripts/cleanup.sh`: detect existing dotfiles, backup to timestamped dir, and remove originals
+- [ ] T005 [US2] Create root `setup.sh`: Orchestrator that runs `cleanup.sh` then `yadm clone --bootstrap`
+- [ ] T006 [US2] Add platform detection (`uname -s`) to logic to ensure correct yadm install command (brew vs apt)
 
 **Checkpoint**: `setup.sh` can be run on a "dirty" machine and result in a clean slate ready for YADM.
 
