@@ -166,6 +166,23 @@ eval "$(zoxide init zsh)"
 # Added by Antigravity
 export PATH="$HOME/.antigravity/antigravity/bin:$PATH"
 
+# macOS (Darwin) Specifics
+if [[ "$(uname -s)" == "Darwin" ]]; then
+    # Homebrew paths
+    if [[ -d "/usr/local/opt/coreutils/libexec/gnubin" ]]; then
+        export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+    fi
+    
+    # Common macOS aliases
+    alias ll="ls -lah"
+    alias update="brew update && brew upgrade"
+    
+    # Ensure Homebrew is in PATH for Apple Silicon
+    if [[ -d "/opt/homebrew/bin" ]]; then
+        export PATH="/opt/homebrew/bin:$PATH"
+    fi
+fi
+
 # Linux/Ubuntu Specifics
 if [[ "$(uname -s)" == "Linux" ]]; then
     alias apt="sudo apt"

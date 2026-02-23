@@ -2,7 +2,7 @@
 
 **Feature Branch**: `001-yadm-dotfiles-setup`  
 **Created**: 2026-02-10  
-**Status**: Draft  
+**Status**: Merged  
 **Input**: User description: "Set up YADM to manage dotfiles across Mac and Ubuntu with cross-platform bootstrap automation"
 
 ## Clarifications

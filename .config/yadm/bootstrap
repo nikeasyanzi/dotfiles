@@ -7,78 +7,166 @@ set -e
 OS="$(uname -s)"
 echo "🚀 Bootstrapping on $OS..."
 
-# --- 1. Package Installation ---
-install_packages() {
-    if [ "$OS" = "Darwin" ]; then
-        echo "🍎 macOS detected. Using Homebrew..."
-        if ! command -v brew &> /dev/null; then
-            echo "Homebrew not found. Installing..."
-            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Ensure Homebrew is installed on macOS before proceeding
+if [ "$OS" = "Darwin" ] && ! command -v brew &> /dev/null; then
+    echo "🍎 macOS detected. Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# --- 1. CLI Tools Installation ---
+
+install_tools_macos() {
+    echo "📦 Installing CLI tools via Homebrew..."
+    
+    # All 8 tools as specified
+    TOOLS=(
+        fd
+        ripgrep
+        bat
+        eza
+        zoxide
+        fzf
+        yazi
+        lsd
+    )
+    
+    # Also install essentials together
+    ESSENTIAL=(
+        git
+        neovim
+        tmux
+        zsh
+    )
+    
+    # Combine and install
+    brew update
+    brew install "${ESSENTIAL[@]}" "${TOOLS[@]}"
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Homebrew install failed!"
+        return 1
+    fi
+    
+    echo "✅ All tools installed via Homebrew"
+    return 0
+}
+
+install_tools_ubuntu() {
+    echo "📦 Installing CLI tools via apt..."
+    
+    # Phase 1: Essential packages that must succeed
+    echo "  Phase 1: Installing essential packages..."
+    ESSENTIAL_TOOLS=(
+        git
+        neovim
+        tmux
+        zsh
+        fd-find
+        ripgrep
+        bat
+        fzf
+        lsd
+    )
+    
+    sudo apt update
+    if ! sudo apt install -y "${ESSENTIAL_TOOLS[@]}"; then
+        echo "❌ Essential apt packages failed! Bootstrap halting."
+        return 1
+    fi
+    
+    # Phase 2: Create symlinks for renamed packages
+    echo "  Phase 2: Creating symlinks for renamed packages..."
+    mkdir -p "$HOME/.local/bin"
+    ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd" 2>/dev/null || true
+    ln -sf /usr/bin/batcat "$HOME/.local/bin/bat" 2>/dev/null || true
+    
+    # Phase 3: Optional packages (not blocking if unavailable)
+    echo "  Phase 3: Attempting to install optional packages..."
+    OPTIONAL_TOOLS=(
+        eza
+        zoxide
+        yazi
+    )
+    
+    MISSING_TOOLS=""
+    for tool in "${OPTIONAL_TOOLS[@]}"; do
+        if ! sudo apt install -y "$tool" 2>/dev/null; then
+            MISSING_TOOLS="$MISSING_TOOLS $tool"
         fi
-        
-        # Update and Install
-        brew update
-        # Core CLI tools
-        PACKAGES=(
-            git
-            neovim
-            tmux
-            zsh
-            fzf
-            ripgrep
-            fd
-            bat
-            lsd
-            zoxide
-            eza
-        )
-        brew install "${PACKAGES[@]}"
-        
-        # Optional: Mac specific casks if we wanted (User said CLI only, so skipping casks)
-        
-    elif [ "$OS" = "Linux" ]; then
-        echo "🐧 Linux detected. Using apt..."
-        # Check for apt
-        if command -v apt &> /dev/null; then
-             sudo apt update
-             
-             # Tools that might be named differently or need ppa
-             # Neovim usually needs unstable ppa for latest, but standard is okay for now
-             # fdfind, batcat
-             
-             COMMON_PACKAGES=(
-                 git
-                 neovim
-                 tmux
-                 zsh
-                 fzf
-                 ripgrep
-                 fd-find
-                 bat
-             )
-             
-             sudo apt install -y "${COMMON_PACKAGES[@]}"
-             
-             # Link fd-find to fd, bat to batcat
-             mkdir -p "$HOME/.local/bin"
-             [ -f /usr/bin/fdfind ] && ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
-             [ -f /usr/bin/batcat ] && ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
-             
-             # Install eza/zoxide via other means if not in apt?
-             # For simplicity, we skip non-standard installs unless critical.
-             # User mentioned specific tools? Plan says "Add Cargo/alternative installs... if needed"
-             # We'll skip complex cargo installs to keep bootstrap fast, unless strictly required.
-             # eza is nice-to-have.
-             
-        else
-            echo "⚠️ Unsupported Linux package manager. Skipping package install."
-        fi
+    done
+    
+    # Phase 4: Report results
+    echo ""
+    echo "✅ CLI Tools Installation Summary:"
+    echo "   Essential installed: fd, ripgrep, bat, fzf, lsd, git, neovim, tmux, zsh"
+    if [ ! -z "$MISSING_TOOLS" ]; then
+        echo "   ⚠️  Not in apt repos:$MISSING_TOOLS"
+        echo "       (optional - you can install later: cargo install$MISSING_TOOLS)"
+    fi
+    
+    # Ensure ~/.local/bin is in PATH
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        echo "       Add to PATH: export PATH=\"\$HOME/.local/bin:\$PATH\""
+    fi
+    
+    return 0
+}
+
+# Install packages based on OS
+if [ "$OS" = "Darwin" ]; then
+    install_tools_macos || { echo "❌ macOS tool installation failed!"; exit 1; }
+elif [ "$OS" = "Linux" ]; then
+    install_tools_ubuntu || { echo "❌ Linux tool installation failed!"; exit 1; }
+fi
+
+# --- 2. Fonts ---
+
+install_fonts_macos() {
+    echo "🔤 Installing JetBrains Mono Nerd Font..."
+    if ! brew install --cask font-jetbrains-mono-nerd-font; then
+        echo "⚠️  Font installation failed (non-blocking). Install manually:"
+        echo "     brew install --cask font-jetbrains-mono-nerd-font"
+    else
+        echo "✅ JetBrains Mono Nerd Font installed via Homebrew"
     fi
 }
 
-install_packages
+install_fonts_ubuntu() {
+    echo "🔤 Installing JetBrains Mono Nerd Font..."
+    local FONT_SRC="$HOME/.config/fonts"
+    local FONT_DEST="$HOME/.local/share/fonts"
+    local FONT_VERSION="v3.4.0"
+    local FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.tar.xz"
 
-# --- 2. Oh My Zsh ---
+    # Download fonts if not bundled in repo
+    if ! ls "$FONT_SRC"/*.ttf &>/dev/null; then
+        echo "  Downloading JetBrains Mono Nerd Font ${FONT_VERSION}..."
+        mkdir -p "$FONT_SRC"
+        if curl -fsSL -o /tmp/JetBrainsMono.tar.xz "$FONT_URL"; then
+            tar -xf /tmp/JetBrainsMono.tar.xz -C "$FONT_SRC"
+            rm -f /tmp/JetBrainsMono.tar.xz
+        else
+            echo "⚠️  Font download failed (non-blocking). Run scripts/download-fonts.sh manually."
+            return 0
+        fi
+    fi
+
+    mkdir -p "$FONT_DEST"
+    echo "  Copying font files to $FONT_DEST..."
+    cp "$FONT_SRC"/*.ttf "$FONT_DEST/"
+    echo "  Rebuilding font cache..."
+    fc-cache -fv
+    echo "✅ JetBrains Mono Nerd Font installed"
+}
+
+# Install fonts based on OS
+if [ "$OS" = "Darwin" ]; then
+    install_fonts_macos
+elif [ "$OS" = "Linux" ]; then
+    install_fonts_ubuntu
+fi
+
+# --- 3. Oh My Zsh ---
 install_omz() {
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
         echo "Installing Oh My Zsh..."
@@ -106,7 +194,7 @@ install_omz() {
 
 install_omz
 
-# --- 3. Shell Setup ---
+# --- 4. Shell Setup ---
 setup_shell() {
     CURRENT_SHELL=$(basename "$SHELL")
     if [ "$CURRENT_SHELL" != "zsh" ]; then
