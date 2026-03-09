@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# blog-new — Create a new bilingual Hugo blog post (tw + en).
+# Usage: blog-new <title> [--serve] [--help]
+
+set -euo pipefail
+
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+[[ -n "${NO_COLOR:-}" ]] && GREEN='' YELLOW='' CYAN='' NC=''
+
+# Default blog directory — adjust as needed
+BLOG_DIR="${BLOG_DIR:-$HOME/workplace/myblog}"
+
+usage() {
+    echo "Usage: blog-new <title> [OPTIONS]"
+    echo ""
+    echo "Create a new bilingual Hugo blog post (content/tw/posts/ + content/en/posts/)."
+    echo ""
+    echo "Arguments:"
+    echo "  <title>       Post title (will be slugified for filename)"
+    echo ""
+    echo "Options:"
+    echo "  --serve, -s   Start hugo server after creating the post"
+    echo "  --dir, -d     Blog directory (default: $BLOG_DIR)"
+    echo "  --help, -h    Show this help message"
+    echo ""
+    echo "Environment:"
+    echo "  BLOG_DIR      Override default blog directory"
+    exit 0
+}
+
+TITLE=""
+SERVE=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --serve|-s) SERVE=true ;;
+        --dir|-d) shift; BLOG_DIR="$1" ;;
+        --help|-h) usage ;;
+        -*) echo "Unknown option: $1"; usage ;;
+        *) TITLE="$1" ;;
+    esac
+    shift
+done
+
+if [[ -z "$TITLE" ]]; then
+    printf "Post title: "
+    read -r TITLE
+fi
+
+if [[ -z "$TITLE" ]]; then
+    echo "${YELLOW}Title cannot be empty.${NC}"
+    exit 1
+fi
+
+# Slugify: lowercase, replace spaces with hyphens, remove special chars
+SLUG=$(echo "$TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')
+FILENAME="${SLUG}.md"
+DATE=$(date +%Y-%m-%dT%H:%M:%S%z)
+
+FRONT_MATTER="---
+title: \"${TITLE}\"
+date: ${DATE}
+draft: true
+tags: []
+categories: []
+---
+
+"
+
+# Create in both language directories
+for lang in tw en; do
+    DIR="${BLOG_DIR}/content/${lang}/posts"
+    FILEPATH="${DIR}/${FILENAME}"
+    
+    if [[ -f "$FILEPATH" ]]; then
+        echo "${YELLOW}Already exists:${NC} $FILEPATH"
+    else
+        mkdir -p "$DIR"
+        echo "$FRONT_MATTER" > "$FILEPATH"
+        echo "${GREEN}Created${NC} ${lang}/posts/${FILENAME}"
+    fi
+done
+
+echo ""
+echo "${CYAN}Edit your posts:${NC}"
+echo "  tw: ${BLOG_DIR}/content/tw/posts/${FILENAME}"
+echo "  en: ${BLOG_DIR}/content/en/posts/${FILENAME}"
+
+if $SERVE; then
+    echo ""
+    echo "${GREEN}Starting hugo server...${NC}"
+    cd "$BLOG_DIR"
+    hugo server -D
+fi

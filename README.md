@@ -4,10 +4,46 @@ Managed via [YADM](https://yadm.io/).
 
 ## Structure
 
-- **.zshrc**: Main shell configuration (Cross-platform).
-- **.config/yadm/bootstrap**: Installation script (Brew/Apt).
-- **scripts/cleanup.sh**: Backup and cleanup utility.
+**Dotfiles (tracked by YADM):**
+- **.zshrc**: Main shell configuration (cross-platform, single file with OS detection).
+- **.gitconfig**: Git configuration.
+- **.tmux.conf**: Tmux configuration.
+- **.p10k.zsh**: Powerlevel10k prompt theme.
+- **.config/nvim/**: Neovim configuration.
+- **.config/yadm/bootstrap**: Package installation script (Brew/Apt).
+- **.config/fonts/**: Nerd Font files for Ubuntu.
+
+**Tooling:**
 - **setup.sh**: One-line deployment script.
+- **scripts/cleanup.sh**: Backup and cleanup utility.
+- **scripts/download-fonts.sh**: Download Nerd Font files.
+- **skills/**: Personal CLI tools (see below).
+
+## Skills (CLI Tools)
+
+The `skills/` directory contains personal shell scripts extracted from common command patterns. Installed automatically to `~/bin` via `skills/install.sh`.
+
+| Command | Description |
+|---------|-------------|
+| `docker-nuke` | Stop & remove all containers, prune system |
+| `brew-maintain` | Full Homebrew maintenance cycle |
+| `grab` | Pick recent file from ~/Downloads → current dir |
+| `dc` | Docker Compose wrapper with auto file detection |
+| `fmt-cpp` | Run clang-format on C/C++ files |
+| `git-kickstart` | Init repo → first commit → set remote → push |
+| `git-squash` | Interactive rebase with smart commit count |
+| `blog-new` | Create bilingual Hugo post (tw + en) |
+| `uv-new` | Scaffold Python project with uv |
+| `ship` | Tar + SCP + cleanup in one command |
+| `run-bmc` | Launch QEMU with OpenBMC image |
+
+```bash
+# Install manually (also run by setup.sh bootstrap)
+cd ~/skills && ./install.sh
+
+# Uninstall
+./skills/install.sh --uninstall
+```
 
 ## CLI Tools Installed
 
@@ -73,6 +109,7 @@ yadm push
 
 - **Adding OS-specific config**: Edit `.zshrc` in the marked Darwin/Linux blocks.
 - **Adding/modifying packages**: Edit `.config/yadm/bootstrap` in the `install_tools_macos()` or `install_tools_ubuntu()` functions.
+- **Adding a new CLI skill**: Add script to `skills/bin/`, update the `SCRIPTS` array in `skills/install.sh`, then re-run `./skills/install.sh`.
 - **Missing optional tools on Ubuntu**: If eza, zoxide, or yazi are missing, manually install via cargo (requires Rust):
   ```bash
   cargo install eza zoxide yazi

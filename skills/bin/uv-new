@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# uv-new — Scaffold a new Python project with uv.
+# Usage: uv-new [PROJECT_NAME] [--help]
+
+set -euo pipefail
+
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+[[ -n "${NO_COLOR:-}" ]] && GREEN='' YELLOW='' CYAN='' NC=''
+
+usage() {
+    echo "Usage: uv-new [PROJECT_NAME] [OPTIONS]"
+    echo ""
+    echo "Scaffold a new Python project with uv, including src/ and tests/ structure."
+    echo ""
+    echo "If PROJECT_NAME is not specified, uses the current directory name"
+    echo "and initializes in the current directory."
+    echo ""
+    echo "Options:"
+    echo "  --no-git       Skip git init"
+    echo "  --help, -h     Show this help message"
+    exit 0
+}
+
+PROJECT_NAME=""
+DO_GIT=true
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --no-git) DO_GIT=false ;;
+        --help|-h) usage ;;
+        -*) echo "Unknown option: $1"; usage ;;
+        *) PROJECT_NAME="$1" ;;
+    esac
+    shift
+done
+
+# Create project directory if name specified
+if [[ -n "$PROJECT_NAME" ]]; then
+    if [[ -d "$PROJECT_NAME" ]]; then
+        echo "${YELLOW}Directory $PROJECT_NAME already exists.${NC}"
+        printf "Continue anyway? [y/N]: "
+        read -r confirm
+        [[ "$confirm" != [yY] ]] && exit 0
+    fi
+    mkdir -p "$PROJECT_NAME"
+    cd "$PROJECT_NAME"
+    echo "${GREEN}→${NC} Created directory: $PROJECT_NAME"
+else
+    PROJECT_NAME=$(basename "$PWD")
+fi
+
+echo "${CYAN}Scaffolding project:${NC} $PROJECT_NAME"
+echo ""
+
+# Initialize with uv
+echo "${GREEN}→${NC} uv init"
+uv init 2>/dev/null || true
+
+# Create directory structure
+echo "${GREEN}→${NC} Creating project structure"
+mkdir -p src tests
+
+# Create src/__init__.py
+if [[ ! -f "src/__init__.py" ]]; then
+    touch src/__init__.py
+fi
+
+# Create tests/__init__.py
+if [[ ! -f "tests/__init__.py" ]]; then
+    touch tests/__init__.py
+fi
+
+# Create a basic test file
+if [[ ! -f "tests/test_example.py" ]]; then
+    cat > tests/test_example.py << 'EOF'
+"""Example test file."""
+
+
+def test_example():
+    """Example test to verify setup works."""
+    assert True
+EOF
+fi
+
+# Add dev dependencies
+echo "${GREEN}→${NC} Adding dev dependencies"
+uv add --dev pytest pytest-cov ruff 2>/dev/null || true
+
+# Create .gitignore if it doesn't exist
+if [[ ! -f ".gitignore" ]]; then
+    cat > .gitignore << 'EOF'
+.DS_Store
+__pycache__/
+*.pyc
+.venv/
+dist/
+*.egg-info/
+.env
+*.log
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+EOF
+fi
+
+# Git init
+if $DO_GIT && [[ ! -d ".git" ]]; then
+    echo "${GREEN}→${NC} git init"
+    git init
+    git add -A
+    git commit -m "chore: initial project setup" 2>/dev/null || true
+fi
+
+# Sync
+echo "${GREEN}→${NC} uv sync"
+uv sync
+
+echo ""
+echo "${GREEN}✓ Project ready!${NC}"
+echo ""
+echo "  Run tests:  uv run pytest"
+echo "  Run lint:   uv run ruff check ."
+echo "  Run script: uv run python src/main.py"
