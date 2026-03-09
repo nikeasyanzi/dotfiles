@@ -9,8 +9,8 @@ Managed via [YADM](https://yadm.io/).
 - **.gitconfig**: Git configuration.
 - **.tmux.conf**: Tmux configuration.
 - **.p10k.zsh**: Powerlevel10k prompt theme.
-- **.config/nvim/**: Neovim configuration.
-- **.config/yadm/bootstrap**: Package installation script (Brew/Apt).
+- **.config/nvim/**: Neovim configuration (LazyVim).
+- **.config/yadm/bootstrap**: Bootstrap script (packages, fonts, Oh My Zsh, shell setup).
 - **.config/fonts/**: Nerd Font files for Ubuntu.
 
 **Tooling:**
@@ -79,16 +79,25 @@ Font files for Ubuntu are stored in `.config/fonts/`. To download them:
 ./scripts/download-fonts.sh
 ```
 
+## Bootstrap Details
+
+The bootstrap (`yadm bootstrap`) performs these steps:
+
+1. **CLI Tools** — installs fd, ripgrep, bat, eza, zoxide, fzf, yazi, lsd (+ git, neovim, tmux, zsh)
+2. **Fonts** — installs JetBrains Mono Nerd Font
+3. **Oh My Zsh** — installs Oh My Zsh, Powerlevel10k theme, zsh-autosuggestions, zsh-syntax-highlighting
+4. **Shell** — sets zsh as default shell
+
 ## Quickstart
 
 ### Mac / Ubuntu
 
 ```bash
 # 1. Clone & Install
-curl -fsSL https://raw.githubusercontent.com/craigyang/dotfiles/main/setup.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nikeasyanzi/dotfiles/main/setup.sh | bash
 ```
 
-*(Note: automatic backup of existing dotfiles is performed before installation)*
+*(Automatic backup of existing dotfiles is performed before installation)*
 
 ## Manual Usage
 

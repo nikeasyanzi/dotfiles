@@ -9,7 +9,7 @@ set -e
 # Since this is a template, we'll ask for it or assume a structure.
 # But for the user's specific case, they know their repo.
 # I'll use a variable REPO_URL that the user must set, or pass as arg.
-REPO_URL="${1:-git@github.com:craigyang/dotfiles.git}"
+REPO_URL="${1:-git@github.com:nikeasyanzi/dotfiles.git}"
 
 echo "🚀 Starting Dotfiles Setup..."
 echo "📦 Repo: $REPO_URL"
