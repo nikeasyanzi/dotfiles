@@ -68,7 +68,6 @@ install_tools_ubuntu() {
         ripgrep
         bat
         fzf
-        lsd
     )
     
     sudo apt update
@@ -89,6 +88,7 @@ install_tools_ubuntu() {
         eza
         zoxide
         yazi
+        lsd
     )
     
     MISSING_TOOLS=""
@@ -101,7 +101,7 @@ install_tools_ubuntu() {
     # Phase 4: Report results
     echo ""
     echo "✅ CLI Tools Installation Summary:"
-    echo "   Essential installed: fd, ripgrep, bat, fzf, lsd, git, neovim, tmux, zsh"
+    echo "   Essential installed: fd, ripgrep, bat, fzf, git, neovim, tmux, zsh"
     if [ ! -z "$MISSING_TOOLS" ]; then
         echo "   ⚠️  Not in apt repos:$MISSING_TOOLS"
         echo "       (optional - you can install later: cargo install$MISSING_TOOLS)"

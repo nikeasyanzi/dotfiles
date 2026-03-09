@@ -59,11 +59,11 @@ The bootstrap process automatically installs modern CLI tools for productivity:
 | **zoxide** | Smart directory navigation (z command) | ✅ | ⚠️ Optional (not in apt) |
 | **fzf** | Fuzzy finder for commands/history | ✅ | ✅ |
 | **yazi** | Terminal file manager | ✅ | ⚠️ Optional (not in apt) |
-| **lsd** | Modern ls with icons | ✅ | ✅ |
+| **lsd** | Modern ls with icons | ✅ | ⚠️ Optional (not in apt) |
 
-**Note**: On Ubuntu, optional tools (eza, zoxide, yazi) not available in standard apt repos. You can install manually later:
+**Note**: On Ubuntu, optional tools (eza, zoxide, yazi, lsd) not available in standard apt repos. You can install manually later:
 ```bash
-cargo install eza zoxide yazi
+cargo install eza zoxide yazi lsd
 ```
 
 ## Font
