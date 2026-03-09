@@ -4,5 +4,8 @@
 .dotfiles-backup-*
 .ssh/id_*
 .ssh/*.pub
-# Exclude .git directory itself (handled by git)
 .netrwhist
+
+# Dev tooling (not part of dotfiles)
+.specify/
+.claude/

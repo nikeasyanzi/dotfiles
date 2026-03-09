@@ -1,5 +1,5 @@
 #!/bin/bash
-# cleanup.sh - Automates backup and removal of existing dotfiles for clean YADM install
+# cleanup.sh - Backup and remove existing dotfiles + symlinks for clean install
 
 set -e
 
@@ -10,25 +10,23 @@ TARGETS=(
     "$HOME/.tmux.conf"
     "$HOME/.gitconfig"
     "$HOME/.p10k.zsh"
-    "$HOME/.config/yadm"
-    "$HOME/.local/share/yadm"
-    "$HOME/.yadm"
+    "$HOME/.config/fonts"
 )
 
-echo "🧹 Starting cleanup for YADM installation..."
+echo "🧹 Starting cleanup..."
 echo "📂 Backup directory: $BACKUP_DIR"
 
 mkdir -p "$BACKUP_DIR"
 
 for target in "${TARGETS[@]}"; do
-    if [ -e "$target" ]; then
+    if [ -L "$target" ]; then
+        echo "   Removing symlink: $target"
+        rm "$target"
+    elif [ -e "$target" ]; then
         echo "   Found existing: $target"
-        
-        # Preserve directory structure in backup
         rel_path="${target#$HOME/}"
         backup_path="$BACKUP_DIR/$rel_path"
         mkdir -p "$(dirname "$backup_path")"
-        
         mv "$target" "$backup_path"
         echo "   Moved to: $backup_path"
     else
@@ -36,4 +34,4 @@ for target in "${TARGETS[@]}"; do
     fi
 done
 
-echo "✨ Cleanup complete. Ready for YADM clone."
+echo "✨ Cleanup complete."

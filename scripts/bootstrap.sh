@@ -1,7 +1,10 @@
 #!/bin/bash
-# .config/yadm/bootstrap - Automated setup script for YADM
+# scripts/bootstrap.sh - Automated setup for packages, fonts, Oh My Zsh, shell
+# Usage: ./scripts/bootstrap.sh
 
 set -e
+
+DOTFILES_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 # OS Detection
 OS="$(uname -s)"
@@ -133,7 +136,7 @@ install_fonts_macos() {
 
 install_fonts_ubuntu() {
     echo "🔤 Installing JetBrains Mono Nerd Font..."
-    local FONT_SRC="$HOME/.config/fonts"
+    local FONT_SRC="$DOTFILES_DIR/.config/fonts"
     local FONT_DEST="$HOME/.local/share/fonts"
     local FONT_VERSION="v3.4.0"
     local FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.tar.xz"

@@ -1,21 +1,22 @@
 # Dotfiles
 
-Managed via [YADM](https://yadm.io/).
+Plain git repo + symlinks. No extra tools required.
 
 ## Structure
 
-**Dotfiles (tracked by YADM):**
+**Dotfiles** (symlinked to `$HOME` by `scripts/link.sh`):
 - **.zshrc**: Main shell configuration (cross-platform, single file with OS detection).
 - **.gitconfig**: Git configuration.
 - **.tmux.conf**: Tmux configuration.
 - **.p10k.zsh**: Powerlevel10k prompt theme.
 - **.config/nvim/**: Neovim configuration (LazyVim).
-- **.config/yadm/bootstrap**: Bootstrap script (packages, fonts, Oh My Zsh, shell setup).
 - **.config/fonts/**: Nerd Font files for Ubuntu.
 
-**Tooling:**
+**Scripts:**
 - **setup.sh**: One-line deployment script.
-- **scripts/cleanup.sh**: Backup and cleanup utility.
+- **scripts/link.sh**: Symlink dotfiles to `$HOME`.
+- **scripts/bootstrap.sh**: Install packages, fonts, Oh My Zsh, shell setup.
+- **scripts/cleanup.sh**: Backup and remove existing configs.
 - **scripts/download-fonts.sh**: Download Nerd Font files.
 - **skills/**: Personal CLI tools (see below).
 
@@ -38,8 +39,8 @@ The `skills/` directory contains personal shell scripts extracted from common co
 | `run-bmc` | Launch QEMU with OpenBMC image |
 
 ```bash
-# Install manually (also run by setup.sh bootstrap)
-cd ~/skills && ./install.sh
+# Install manually (also run by setup.sh)
+cd ~/.dotfiles/skills && ./install.sh
 
 # Uninstall
 ./skills/install.sh --uninstall
@@ -81,7 +82,7 @@ Font files for Ubuntu are stored in `.config/fonts/`. To download them:
 
 ## Bootstrap Details
 
-The bootstrap (`yadm bootstrap`) performs these steps:
+The bootstrap (`scripts/bootstrap.sh`) performs these steps:
 
 1. **CLI Tools** — installs fd, ripgrep, bat, eza, zoxide, fzf, yazi, lsd (+ git, neovim, tmux, zsh)
 2. **Fonts** — installs JetBrains Mono Nerd Font
@@ -103,28 +104,29 @@ curl -fsSL https://raw.githubusercontent.com/nikeasyanzi/dotfiles/main/setup.sh 
 
 **Update dotfiles:**
 ```bash
-yadm pull
-yadm bootstrap
+cd ~/.dotfiles && git pull
+./scripts/link.sh
+./scripts/bootstrap.sh
 ```
 
 **Add new file:**
 ```bash
-yadm add <file>
-yadm commit -m "Add new config"
-yadm push
+cd ~/.dotfiles
+git add <file>
+git commit -m "Add new config"
+git push
 ```
 
 ## Maintenance
 
 - **Adding OS-specific config**: Edit `.zshrc` in the marked Darwin/Linux blocks.
-- **Adding/modifying packages**: Edit `.config/yadm/bootstrap` in the `install_tools_macos()` or `install_tools_ubuntu()` functions.
+- **Adding/modifying packages**: Edit `scripts/bootstrap.sh` in the `install_tools_macos()` or `install_tools_ubuntu()` functions.
+- **Adding a new dotfile**: Add symlink entry in `scripts/link.sh`, then re-run `./scripts/link.sh`.
 - **Adding a new CLI skill**: Add script to `skills/bin/`, update the `SCRIPTS` array in `skills/install.sh`, then re-run `./skills/install.sh`.
 - **Missing optional tools on Ubuntu**: If eza, zoxide, or yazi are missing, manually install via cargo (requires Rust):
   ```bash
   cargo install eza zoxide yazi
   ```
-- **Troubleshooting bootstrap**: Re-run `yadm bootstrap` or execute `~/.config/yadm/bootstrap` directly for detailed output.
+- **Troubleshooting bootstrap**: Re-run `./scripts/bootstrap.sh` for detailed output.
 
-## Future Work
-
-See [FUTURE.md](FUTURE.md) for planned improvements and backlog items.
+See [FUTURE.md](FUTURE.md) for planned improvements.
