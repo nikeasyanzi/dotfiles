@@ -1,21 +1,18 @@
 #!/bin/bash
-# setup.sh - One-line deploy script for YADM dotfiles
-# Usage: bash setup.sh
+# setup.sh - One-line deploy script for dotfiles
+# Usage: curl -fsSL https://raw.githubusercontent.com/nikeasyanzi/dotfiles/main/setup.sh | bash
+#   or:  bash setup.sh [repo-url]
 
 set -e
 
-# Repository URL (User should update this after forking/creating repo)
-# For now, we use a placeholder or detect if run from within repo?
-# Since this is a template, we'll ask for it or assume a structure.
-# But for the user's specific case, they know their repo.
-# I'll use a variable REPO_URL that the user must set, or pass as arg.
-REPO_URL="${1:-git@github.com:craigyang/dotfiles.git}"
+REPO_URL="${1:-https://github.com/nikeasyanzi/dotfiles.git}"
+DOTFILES_DIR="$HOME/.dotfiles"
 
 echo "🚀 Starting Dotfiles Setup..."
 echo "📦 Repo: $REPO_URL"
 
-# --- Inline Cleanup Logic (copied from scripts/cleanup.sh to ensure standalone execution) ---
-clean_existing() {
+# --- Backup existing configs before overwriting ---
+backup_existing() {
     BACKUP_DIR="$HOME/.dotfiles-backup-$(date +%Y%m%d%H%M%S)"
     TARGETS=(
         "$HOME/.zshrc"
@@ -23,61 +20,49 @@ clean_existing() {
         "$HOME/.tmux.conf"
         "$HOME/.gitconfig"
         "$HOME/.p10k.zsh"
-        "$HOME/.config/yadm"
-        "$HOME/.local/share/yadm"
-        "$HOME/.yadm"
     )
 
     echo "🧹 Checking for existing config files..."
-    mkdir -p "$BACKUP_DIR"
-    
     local found=0
     for target in "${TARGETS[@]}"; do
-        if [ -e "$target" ]; then
+        if [ -e "$target" ] && [ ! -L "$target" ]; then
+            if [ "$found" -eq 0 ]; then
+                mkdir -p "$BACKUP_DIR"
+            fi
             found=1
             echo "   Found existing: $target"
             rel_path="${target#$HOME/}"
             backup_path="$BACKUP_DIR/$rel_path"
             mkdir -p "$(dirname "$backup_path")"
             mv "$target" "$backup_path"
+        elif [ -L "$target" ]; then
+            rm "$target"
         fi
     done
-    
-    if [ "$found" -eq 0 ]; then
-        rmdir "$BACKUP_DIR" 2>/dev/null || true
-    else
+
+    if [ "$found" -ne 0 ]; then
         echo "✅ Backup created at: $BACKUP_DIR"
     fi
 }
-# -------------------------------------------------------------------------------------------
 
-# 1. Run Cleanup
-clean_existing
+backup_existing
 
-# 2. Install YADM if missing
-SYSTEM_TYPE=$(uname -s)
-if ! command -v yadm &> /dev/null; then
-    echo "⬇️  Installing YADM..."
-    if [ "$SYSTEM_TYPE" = "Darwin" ]; then
-        if ! command -v brew &> /dev/null; then
-             echo "Error: Homebrew not found. Please install Homebrew first."
-             exit 1
-        fi
-        brew install yadm
-    elif [ "$SYSTEM_TYPE" = "Linux" ]; then
-        if command -v apt &> /dev/null; then
-            sudo apt update && sudo apt install -y yadm
-        else
-            echo "Error: Unsupported Linux distro (apt not found)."
-            exit 1
-        fi
-    fi
+# --- Clone repo ---
+if [ -d "$DOTFILES_DIR" ]; then
+    echo "📥 Updating existing dotfiles..."
+    git -C "$DOTFILES_DIR" pull --ff-only
 else
-    echo "✅ YADM already installed."
+    echo "📥 Cloning dotfiles..."
+    git clone "$REPO_URL" "$DOTFILES_DIR"
 fi
 
-# 3. Clone Dotfiles
-echo "📥 Cloning dotfiles..."
-yadm clone "$REPO_URL" --bootstrap
+# --- Link dotfiles ---
+"$DOTFILES_DIR/scripts/link.sh"
+
+# --- Run bootstrap ---
+"$DOTFILES_DIR/scripts/bootstrap.sh"
+
+# --- Install skills ---
+"$DOTFILES_DIR/skills/install.sh"
 
 echo "🎉 Setup complete! Restart your shell."

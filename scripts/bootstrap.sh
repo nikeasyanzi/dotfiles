@@ -1,7 +1,10 @@
 #!/bin/bash
-# .config/yadm/bootstrap - Automated setup script for YADM
+# scripts/bootstrap.sh - Automated setup for packages, fonts, Oh My Zsh, shell
+# Usage: ./scripts/bootstrap.sh
 
 set -e
+
+DOTFILES_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 # OS Detection
 OS="$(uname -s)"
@@ -65,7 +68,6 @@ install_tools_ubuntu() {
         ripgrep
         bat
         fzf
-        lsd
     )
     
     sudo apt update
@@ -86,6 +88,7 @@ install_tools_ubuntu() {
         eza
         zoxide
         yazi
+        lsd
     )
     
     MISSING_TOOLS=""
@@ -98,7 +101,7 @@ install_tools_ubuntu() {
     # Phase 4: Report results
     echo ""
     echo "✅ CLI Tools Installation Summary:"
-    echo "   Essential installed: fd, ripgrep, bat, fzf, lsd, git, neovim, tmux, zsh"
+    echo "   Essential installed: fd, ripgrep, bat, fzf, git, neovim, tmux, zsh"
     if [ ! -z "$MISSING_TOOLS" ]; then
         echo "   ⚠️  Not in apt repos:$MISSING_TOOLS"
         echo "       (optional - you can install later: cargo install$MISSING_TOOLS)"
@@ -133,7 +136,7 @@ install_fonts_macos() {
 
 install_fonts_ubuntu() {
     echo "🔤 Installing JetBrains Mono Nerd Font..."
-    local FONT_SRC="$HOME/.config/fonts"
+    local FONT_SRC="$DOTFILES_DIR/.config/fonts"
     local FONT_DEST="$HOME/.local/share/fonts"
     local FONT_VERSION="v3.4.0"
     local FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.tar.xz"
