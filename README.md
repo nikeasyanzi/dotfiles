@@ -86,8 +86,8 @@ The bootstrap (`scripts/bootstrap.sh`) performs these steps:
 
 1. **CLI Tools** — installs fd, ripgrep, bat, eza, zoxide, fzf, yazi, lsd (+ git, neovim, tmux, zsh)
 2. **Fonts** — installs JetBrains Mono Nerd Font
-3. **Oh My Zsh** — installs Oh My Zsh, Powerlevel10k theme, zsh-autosuggestions, zsh-syntax-highlighting
-4. **Shell** — sets zsh as default shell
+3. **Oh My Zsh** — installs Oh My Zsh, Powerlevel10k theme, zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions, zsh-history-substring-search
+4. **Shell** — sets zsh as default shell (uses `usermod` instead of `chsh` to avoid interactive prompt when run via `curl | bash`)
 
 ## Quickstart
 
