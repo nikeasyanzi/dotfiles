@@ -188,6 +188,14 @@ install_omz() {
     if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
         git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
     fi
+
+    if [ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
+        git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
+    fi
+
+    if [ ! -d "$ZSH_CUSTOM/plugins/zsh-history-substring-search" ]; then
+        git clone https://github.com/zsh-users/zsh-history-substring-search "$ZSH_CUSTOM/plugins/zsh-history-substring-search"
+    fi
     
     # Install Powerlevel10k
     if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
