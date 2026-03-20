@@ -202,14 +202,17 @@ setup_shell() {
     CURRENT_SHELL=$(basename "$SHELL")
     if [ "$CURRENT_SHELL" != "zsh" ]; then
         echo "Changing default shell to zsh..."
-        # If zsh is in allowed shells
+        # Use usermod instead of chsh to avoid interactive password prompt.
+        # chsh uses PAM which prompts for password and halts in curl|bash.
+        # usermod -s changes shell directly with no interactive prompt.
         ZSH_PATH=$(command -v zsh)
-        if grep -q "$ZSH_PATH" /etc/shells; then
-            chsh -s "$ZSH_PATH"
-        else
+        if ! grep -q "$ZSH_PATH" /etc/shells; then
             echo "Adding $ZSH_PATH to /etc/shells..."
             echo "$ZSH_PATH" | sudo tee -a /etc/shells
-            chsh -s "$ZSH_PATH"
+        fi
+        if ! sudo usermod -s "$ZSH_PATH" "$USER" 2>/dev/null; then
+            echo "⚠️  Could not change default shell (sudo required)."
+            echo "   Run manually: chsh -s $ZSH_PATH"
         fi
     fi
 }
