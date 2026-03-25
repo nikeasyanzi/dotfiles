@@ -10,7 +10,6 @@ TARGETS=(
     "$HOME/.tmux.conf"
     "$HOME/.gitconfig"
     "$HOME/.p10k.zsh"
-    "$HOME/.config/fonts"
 )
 
 echo "🧹 Starting cleanup..."

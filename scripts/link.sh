@@ -17,7 +17,6 @@ LINKS=(
 # Directories to symlink
 DIR_LINKS=(
     ".config/nvim"
-    ".config/fonts"
 )
 
 unlink_all() {

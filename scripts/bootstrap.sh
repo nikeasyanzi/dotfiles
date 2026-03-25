@@ -57,6 +57,10 @@ install_tools_macos() {
 install_tools_ubuntu() {
     echo "📦 Installing CLI tools via apt..."
     
+    # Add neovim unstable PPA for latest version
+    echo "  Adding neovim unstable PPA..."
+    sudo add-apt-repository -y ppa:neovim-ppa/unstable
+    
     # Phase 1: Essential packages that must succeed
     echo "  Phase 1: Installing essential packages..."
     ESSENTIAL_TOOLS=(
@@ -123,43 +127,38 @@ elif [ "$OS" = "Linux" ]; then
 fi
 
 # --- 2. Fonts ---
+# Meslo Nerd Font files are bundled in the repo — no download needed.
 
 install_fonts_macos() {
-    echo "🔤 Installing JetBrains Mono Nerd Font..."
-    if ! brew install --cask font-jetbrains-mono-nerd-font; then
-        echo "⚠️  Font installation failed (non-blocking). Install manually:"
-        echo "     brew install --cask font-jetbrains-mono-nerd-font"
-    else
-        echo "✅ JetBrains Mono Nerd Font installed via Homebrew"
-    fi
-}
+    echo "🔤 Installing Meslo Nerd Font..."
+    local FONT_SRC="$DOTFILES_DIR/Meslo Nerd Font patched for Powerlevel10k"
+    local FONT_DEST="$HOME/Library/Fonts"
 
-install_fonts_ubuntu() {
-    echo "🔤 Installing JetBrains Mono Nerd Font..."
-    local FONT_SRC="$DOTFILES_DIR/.config/fonts"
-    local FONT_DEST="$HOME/.local/share/fonts"
-    local FONT_VERSION="v3.4.0"
-    local FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/${FONT_VERSION}/JetBrainsMono.tar.xz"
-
-    # Download fonts if not bundled in repo
     if ! ls "$FONT_SRC"/*.ttf &>/dev/null; then
-        echo "  Downloading JetBrains Mono Nerd Font ${FONT_VERSION}..."
-        mkdir -p "$FONT_SRC"
-        if curl -fsSL -o /tmp/JetBrainsMono.tar.xz "$FONT_URL"; then
-            tar -xf /tmp/JetBrainsMono.tar.xz -C "$FONT_SRC"
-            rm -f /tmp/JetBrainsMono.tar.xz
-        else
-            echo "⚠️  Font download failed (non-blocking). Run scripts/download-fonts.sh manually."
-            return 0
-        fi
+        echo "❌ Font files not found in repo at: $FONT_SRC"
+        return 1
     fi
 
     mkdir -p "$FONT_DEST"
-    echo "  Copying font files to $FONT_DEST..."
+    cp "$FONT_SRC"/*.ttf "$FONT_DEST/"
+    echo "✅ Meslo Nerd Font installed to $FONT_DEST"
+}
+
+install_fonts_ubuntu() {
+    echo "🔤 Installing Meslo Nerd Font..."
+    local FONT_SRC="$DOTFILES_DIR/Meslo Nerd Font patched for Powerlevel10k"
+    local FONT_DEST="$HOME/.local/share/fonts"
+
+    if ! ls "$FONT_SRC"/*.ttf &>/dev/null; then
+        echo "❌ Font files not found in repo at: $FONT_SRC"
+        return 1
+    fi
+
+    mkdir -p "$FONT_DEST"
     cp "$FONT_SRC"/*.ttf "$FONT_DEST/"
     echo "  Rebuilding font cache..."
     fc-cache -fv
-    echo "✅ JetBrains Mono Nerd Font installed"
+    echo "✅ Meslo Nerd Font installed to $FONT_DEST"
 }
 
 # Install fonts based on OS

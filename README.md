@@ -10,14 +10,13 @@ Plain git repo + symlinks. No extra tools required.
 - **.tmux.conf**: Tmux configuration.
 - **.p10k.zsh**: Powerlevel10k prompt theme.
 - **.config/nvim/**: Neovim configuration (LazyVim).
-- **.config/fonts/**: Nerd Font files for Ubuntu.
+- **Meslo Nerd Font patched for Powerlevel10k/**: Bundled font files.
 
 **Scripts:**
 - **setup.sh**: One-line deployment script.
 - **scripts/link.sh**: Symlink dotfiles to `$HOME`.
 - **scripts/bootstrap.sh**: Install packages, fonts, Oh My Zsh, shell setup.
 - **scripts/cleanup.sh**: Backup and remove existing configs.
-- **scripts/download-fonts.sh**: Download Nerd Font files.
 - **skills/**: Personal CLI tools (see below).
 
 ## Skills (CLI Tools)
@@ -68,24 +67,19 @@ cargo install eza zoxide yazi lsd
 
 ## Font
 
-The bootstrap installs **JetBrains Mono Nerd Font** — a developer-friendly monospace font patched with icon glyphs for Powerlevel10k and terminal tools.
+The bootstrap installs **Meslo Nerd Font** (patched for Powerlevel10k) — font files are bundled in the repo, no download needed.
 
-| Platform | Method |
-|----------|--------|
-| **macOS** | `brew install --cask font-jetbrains-mono-nerd-font` |
-| **Ubuntu** | Bundled `.ttf` files copied to `~/.local/share/fonts/` |
-
-Font files for Ubuntu are stored in `.config/fonts/`. To download them:
-```bash
-./scripts/download-fonts.sh
-```
+| Platform | Destination |
+|----------|-------------|
+| **macOS** | `~/Library/Fonts/` |
+| **Ubuntu** | `~/.local/share/fonts/` |
 
 ## Bootstrap Details
 
 The bootstrap (`scripts/bootstrap.sh`) performs these steps:
 
 1. **CLI Tools** — installs fd, ripgrep, bat, eza, zoxide, fzf, yazi, lsd (+ git, neovim, tmux, zsh)
-2. **Fonts** — installs JetBrains Mono Nerd Font
+2. **Fonts** — installs Meslo Nerd Font
 3. **Oh My Zsh** — installs Oh My Zsh, Powerlevel10k theme, zsh-autosuggestions, zsh-syntax-highlighting, zsh-completions, zsh-history-substring-search
 4. **Shell** — sets zsh as default shell (uses `usermod` instead of `chsh` to avoid interactive prompt when run via `curl | bash`)
 
