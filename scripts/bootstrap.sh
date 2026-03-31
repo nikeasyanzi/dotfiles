@@ -16,6 +16,17 @@ if [ "$OS" = "Darwin" ] && ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
+# --- 0. Ensure git is available (required for all subsequent git clone calls) ---
+if ! command -v git &> /dev/null; then
+    echo "📦 git not found. Installing git..."
+    if [ "$OS" = "Darwin" ]; then
+        brew install git
+    elif [ "$OS" = "Linux" ]; then
+        sudo apt update && sudo apt install -y git
+    fi
+    echo "✅ git installed"
+fi
+
 # --- 1. CLI Tools Installation ---
 
 install_tools_macos() {
